@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+<script src="jquery-1.8.3.js"></script>
+<style type="text/css">
+html, body {
+        background-color: #000;
+        color: #fff;
+        height: 100%;
+}
+#interface {
+        width: 640px;
+}
+table {
+        font-family: 'Georgia';
+}
+td {
+        vertical-align: top;
+        padding: 5px;
+        margin: 5px;
+}
+div {
+        width: 100%;
+}
+#convinput {
+        width: 100%;
+        height: 50%;
+}
+</style>
+<script>
+var CONV_DB = (function () {
+        "use strict";
+
+        var convLogs = [],
+                createConversation = function () {
+                        var newConv = convLogs.length;
+
+                        convLogs[newConv] = (function (key) {
+                                var dateParsed,
+                                        timeParsed,
+                                        startDate,
+                                        endDate,
+                                        convName = key,
+                                        origText, // the whole original text intact
+                                        convLines = [], // the lines of the conversation split by line break
+                                        convLog = [], // an array containing the logs of each line (date, time, text, author, etc) as objects
+                                        changeName = function (name) {
+                                                // TODO: check name exists, or assign it something
+                                                convName = name;
+                                        },
+                                        parseText = function (text) {
+                                                // TODO: it should be possible for the user to change these formats
+                                                var dateTimeAuthRegExp = /\[[\d]+\/[\d]+\/\d\d\d\d\s[\d]+\:\d\d:\d\d[\s]*[\w]*\]\s[\w|\s|.]+:\s/,
+                                                                // assumes the date and time appear together in squared brackets followed by a space, author's name, a colon and a space 
+                                                        dateTimeRegExp = /\[[\d]+\/[\d]+\/\d\d\d\d\s[\d]+\:\d\d:\d\d[\s]*[\w]*\]/,
+                                                                // assumes date and time appear thus: [##/##/#### ##:##:##] possibly with an AM or PM on the end
+                                                        dateRegExp = /[\d]+\/[\d]+\/\d\d\d\d/,
+                                                        timeRegExp = /[\d]+\:\d\d:\d\d[\s]*[\w]*/,
+                                                        authRegExp = /\w[\w\w|\s|.]*:\s/,
+                                                                // assumes authors name contains alphanumeric characters, spaces, and dots only and is followed by a colon and a space
+                                                                // slightly different to the match contained above as we don't want the string to begin with a space
+                                                                // therefore we assume that a username must start with an alphanumeric. after this it doesn't matter if we find more characters or not (an author's name could be just one letter long) so the + is a * here.
+                                                        dateTimeAuthObj,
+                                                        dateTimeObj, // variable for storing the object returned by a match
+                                                        dateStr = '',
+                                                        timeStr = '',
+                                                        authStr = '',
+                                                        textStr = '',
+                                                        i; // counter variable
+
+                                                // TODO: check text exists and is the right type, or assign it something
+                                                origText = text;
+                                                convLines = text.split(/\n+/); // put each contribution to the conversation into an array
+                                                //console.log(convLines);
+                                                i = convLines.length;
+
+                                                while (i) {
+                                                        i -= 1;
+                                                        textStr = convLines[i];
+                                                        dateStr = '';
+                                                        timeStr = '';
+                                                        authStr = '';
+                                                        /*
+                                                                needs to be a way to structure this with ternary conditional operators
+                                                                ... or better still perhaps rethink the split by line break and do a split by date/time
+                                                        */
+                                                        dateTimeAuthObj = convLines[i].match(dateTimeAuthRegExp);
+                                                        if (dateTimeAuthObj) {
+                                                                dateTimeObj = dateTimeAuthObj[0].match(dateTimeRegExp);
+                                                                // TODO: check index property of dateTimeStr object is 0
+                                                                if (dateTimeObj) {
+                                                                        //console.log(dateTimeAuthObj[0]);
+                                                                        dateStr = dateTimeObj[0].match(dateRegExp)[0];
+                                                                        timeStr = dateTimeObj[0].match(timeRegExp)[0];
+                                                                        //console.log(dateTimeObj[0], dateStr, timeStr);
+                                                                }
+                                                                authStr = dateTimeAuthObj[0].replace(/\[[\d]+\/[\d]+\/\d\d\d\d\s[\d]+\:\d\d:\d\d[\s]*[\w]*\]\s([\w|\s|.]+):\s/, '$1');
+                                                                //authStr = dateTimeAuthObj[0].match(authRegExp)[0];
+                                                                textStr = textStr.replace(dateTimeAuthObj[0], '');
+                                                                        // removes date time and author leaving just the text the user typed
+                                                        }
+
+                                                        // TODO: should i make a local reference to this?
+                                                        // TODO: does making a local version make a copy or a pointer to the higher stacked version?
+                                                        convLog[i] = {
+                                                                'Date' : dateStr,
+                                                                'Time' : timeStr,
+                                                                'Author' : authStr,
+                                                                'Contribution' : textStr
+                                                        }; // does it need a closure?
+                                                }
+                                                return convLog;
+                                        },
+                                        getJSON = function () {
+                                                return convLog; // TODO: will return an array -- but that's okay isn't it?
+                                        };
+
+                                return {
+                                        changeName: changeName,
+                                        parseText: parseText
+                                };
+                        }(newConv));
+
+                        return convLogs[newConv];
+                };
+
+        return {
+                createConversation: createConversation
+        };
+}());
+
+
+
+/*
+function parse() {
+        var textEntryArea = document.getElementById('convinput');
+        var textToParse = (textEntryArea) ? textEntryArea.innerHTML : '';
+                
+}
+*/
+
+
+window.onload = function () {
+        "use strict";
+        document.getElementById('convparse').onclick = function () {
+                document.getElementById('convoutput').innerHTML = (function (convObj) {
+                        var str = "<table><tr>",
+                                i = (convObj) ? convObj.length : 0,
+                                convObj = (convObj) ? convObj.reverse() : [],
+                                prop;
+
+                        for (prop in convObj[0]) {
+                                str += (convObj[0].hasOwnProperty(prop)) ? "<td>" + prop + "</td>" : "";
+                        }
+                        str += "</tr>";
+                        while (i) {
+                                str += "<tr>";
+                                i -= 1;
+                                for (prop in convObj[i]) {
+                                        str += (convObj[i].hasOwnProperty(prop)) ? "<td>" + convObj[i][prop] + "</td>" : "<td></td>";
+                                                // TODO need to ensure there aren't any html tags in the text
+                                }
+                                str += "</tr>";
+                        }
+                        str += "</table>";
+
+                        return str;
+                }(CONV_DB.createConversation().parseText(document.getElementById('convinput').value)));
+        };
+        
+        document.getElementById('convoutput-save').onclick = function () {
+                
+                
+                
+        }
+
+};
+
+</script>
+</head>
+<body>
+<div id="interface">
+<div>
+<input type="text" id="convtitle">
+</div>
+<div>
+<textarea id="convinput">
+</textarea>
+</div>
+<div class="convoutput-toolbar">
+<input id="convparse" type="button" value="Show as table">
+<input id="convoutput-save" type="button" value="Save to JSON" disabled="disabled">
+<input id="convoutput-save" type="button" value="Save to MySQL" disabled="disabled">
+</div>
+</div>
+
+<div id="convoutput">
+</div>
+
+</body>
+</html>
