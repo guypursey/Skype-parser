@@ -70,7 +70,7 @@ var CONV_DB = (function () {
 
                                                 // TODO: check text exists and is the right type, or assign it something
                                                 origText = text;
-                                                convLines = text.split(/\n+/); // put each contribution to the conversation into an array
+                                                convLines = text.split(/\n+(?=\[)/); // put each contribution to the conversation into an array
                                                 //console.log(convLines);
                                                 i = convLines.length;
 
@@ -117,15 +117,21 @@ var CONV_DB = (function () {
 
                                 return {
                                         changeName: changeName,
-                                        parseText: parseText
+                                        parseText: parseText,
+										getJSON: getJSON
                                 };
                         }(newConv));
 
                         return convLogs[newConv];
-                };
+                },
+				retrieveConversation = function (convKey) {
+					//console.log(convLogs);
+					return convLogs[convKey];
+				};
 
         return {
-                createConversation: createConversation
+                createConversation: createConversation,
+				retrieveConversation: retrieveConversation
         };
 }());
 
@@ -166,11 +172,12 @@ window.onload = function () {
 
                         return str;
                 }(CONV_DB.createConversation().parseText(document.getElementById('convinput').value)));
+				document.getElementById('convoutput-json').disabled=false;
         };
         
-        document.getElementById('convoutput-save').onclick = function () {
+        document.getElementById('convoutput-json').onclick = function () {
                 
-                
+				document.getElementById('convjson').value = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
                 
         }
 
@@ -186,11 +193,14 @@ window.onload = function () {
 <div>
 <textarea id="convinput">
 </textarea>
+<textarea id="convjson">
+</textarea>
 </div>
 <div class="convoutput-toolbar">
 <input id="convparse" type="button" value="Show as table">
+<input id="convoutput-json" type="button" value="Display as JSON" disabled="disabled">
 <input id="convoutput-save" type="button" value="Save to JSON" disabled="disabled">
-<input id="convoutput-save" type="button" value="Save to MySQL" disabled="disabled">
+<!--<input id="convoutput-save" type="button" value="Save to MySQL" disabled="disabled">-->
 </div>
 </div>
 
