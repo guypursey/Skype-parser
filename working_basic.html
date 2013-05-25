@@ -3,13 +3,21 @@
 <head>
 <script src="/lib/jquery-1.8.3.js"></script>
 <style type="text/css">
+* {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
 html, body {
 	background-color: #000;
 	color: #fff;
 	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
 }
 #interface {
-	width: 640px;
+	width: 100%;
 }
 table {
 	font-family: 'Georgia';
@@ -19,12 +27,18 @@ td {
 	padding: 5px;
 	margin: 5px;
 }
-div {
-	width: 100%;
-}
 #convinput {
-	width: 100%;
+	width: 90%;
 	height: 50%;
+}
+#convjson {
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	-webkit-tab-size: 4;
+	tab-size: 4;
+}
+#convoutput {
+	width: 100%;
 }
 </style>
 <script>
@@ -168,7 +182,7 @@ window.onload = function () {
 	};
 	
 	document.getElementById('convoutput-json').onclick = function () {
-		document.getElementById('convjson').value = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
+		document.getElementById('convjson').innerHTML = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
 	}
 
 };
@@ -183,7 +197,7 @@ window.onload = function () {
 <div>
 <textarea id="convinput">
 </textarea>
-<textarea id="convjson">
+<textarea id="convjson" readonly>
 </textarea>
 </div>
 <div class="convoutput-toolbar">
