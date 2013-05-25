@@ -217,9 +217,13 @@ window.onload = function () {
 <div class="convoutput-toolbar">
 <input id="convoutput-json" type="button" value="Display as JSON" disabled="disabled">
 </div>
-<textarea id="convjson" readonly>
+<div id="pages">
+<div id="loading" class="page">
+Loading
+</div>
+<textarea id="convjson" readonly class="page tabbed">
 </textarea>
-<div id="convoutput">
+<div id="convoutput" class="page tabbed">
 </div>
 </div>
 
