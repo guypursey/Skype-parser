@@ -6,17 +6,63 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	-webkit-tab-size: 4;
+	tab-size: 4;
 }
 html, body {
 	background-color: #000;
 	color: #fff;
 	height: 100%;
 	width: 100%;
-	margin: 0;
-	padding: 0;
 }
 #interface {
+	width: 50%;
+	height: 100%;
+	display: inline-block;
+	float: left;
+}
+#results {
+	width: 50%;
+	height: 100%;
+	display: inline-block;
+	float: right;
+}
+#tabbar {
 	width: 100%;
+	height: 10%;
+}
+#pages {
+	width: 100%;
+	height: 90%;
+	position: relative;
+}
+.tab {
+	display: inline-block;
+	padding: 5px;
+	width: 20%;
+	overflow: hidden;
+}
+.page {
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.tabbed {
+	z-index: 1 !important;
+	display: none;
+}
+.selectedTab {
+	text-decoration: underline;
+}
+.selectedPage {
+	display: block;
 }
 table {
 	font-family: 'Georgia';
@@ -26,18 +72,23 @@ td {
 	padding: 5px;
 	margin: 5px;
 }
+#convtitle {
+	width: 80%;
+	height: 10%;
+}
+#convparse {
+	width: 10%;
+	height: 10%;
+}
 #convinput {
-	width: 90%;
-	height: 50%;
+	width: 100%;
+	height: 90%;
 }
 #convjson {
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	-webkit-tab-size: 4;
-	tab-size: 4;
+
 }
-#convoutput {
-	width: 100%;
+#convhtml{
+	background-color: #000;
 }
 </style>
 <script>
@@ -156,7 +207,7 @@ function parse() {
 window.onload = function () {
 	"use strict";
 	document.getElementById('convparse').onclick = function () {
-		document.getElementById('convoutput').innerHTML = (function (convObj) {
+		document.getElementById('convhtml').innerHTML = (function (convObj) {
 			var str = "<table><tr>",
 				i = (convObj) ? convObj.length : 0,
 				convObj = (convObj) ? convObj.reverse() : [],
@@ -177,11 +228,56 @@ window.onload = function () {
 			str += "</table>";
 			return str;
 		}(CONV_DB.createConversation().parseText(document.getElementById('convinput').value)));
-		document.getElementById('convoutput-json').disabled=false;
+		
+		//temporary solution: show first conversation entered in JSON page
+		document.getElementById('convjson').innerHTML = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
+		//document.getElementById('convoutput-json').disabled=false;
 	};
 	
-	document.getElementById('convoutput-json').onclick = function () {
-		document.getElementById('convjson').innerHTML = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
+	document.getElementById('show-json').onclick = function () {
+		// First find anything with the selectedTab class.
+		var selectedTab = document.getElementsByClassName('selectedTab');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
+		
+		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
+		this.classList.add('selectedTab');
+		
+		// First find anything with the selectedPage class.
+		var selectedPage = document.getElementsByClassName('selectedPage');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
+		
+		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
+		document.getElementById('convjson').classList.add('selectedPage');
+		
+	}
+	
+	document.getElementById('show-html').onclick = function () {
+		// First find anything with the selectedTab class.
+		var selectedTab = document.getElementsByClassName('selectedTab');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
+		
+		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
+		this.classList.add('selectedTab');
+		
+		// First find anything with the selectedPage class.
+		var selectedPage = document.getElementsByClassName('selectedPage');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
+		
+		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
+		document.getElementById('convhtml').classList.add('selectedPage');
+			
 	}
 
 };
@@ -190,22 +286,24 @@ window.onload = function () {
 </head>
 <body>
 <div id="interface">
-<div>
 <input type="text" id="convtitle">
-</div>
-<div>
+<input id="convparse" type="button" value="Parse">
 <textarea id="convinput">
 </textarea>
-<textarea id="convjson" readonly>
+</div>
+<div id="results">
+<div class="tabbar">
+<div id="show-html" class="tab">HTML</div>
+<div id="show-json" class="tab">JSON</div>
+</div>
+<div id="pages">
+<div id="loading" class="page">
+Loading
+</div>
+<textarea id="convjson" readonly class="page tabbed">
 </textarea>
+<div id="convhtml" class="page tabbed">
 </div>
-<div class="convoutput-toolbar">
-<input id="convparse" type="button" value="Show as table">
-<input id="convoutput-json" type="button" value="Display as JSON" disabled="disabled">
-</div>
-</div>
-
-<div id="convoutput">
 </div>
 
 </body>
