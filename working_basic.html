@@ -199,9 +199,21 @@ var CONV_DB = (function () {
 			}(newConv));
 			return convLogs[newConv];
 		},
+		copyObj = function (obj) {
+			var i,
+				copy = (typeof obj === "object") ? ((obj instanceof Array) ? [] : {}) : obj;
+			for (i in obj) {
+				if (typeof obj[i] === "object") {
+					copy[i] = copyObj(obj[i]);
+				} else {
+					copy[i] = obj[i];
+				}
+			}
+			return copy;
+		},
 		retrieveConversation = function (convKey) {
 			//console.log(convLogs);
-			return convLogs[convKey];
+			return copyObj(convLogs[convKey]);
 		};
 		return {
 			createConversation: createConversation,
