@@ -99,7 +99,7 @@ td {
 	background-color: #000;
 }
 
-#rsbutton {
+#rsbutton, #rrsbutton {
 	position: absolute;
 	display: block;
 	right: 10px;
@@ -329,6 +329,13 @@ window.onload = function () {
 		
 		// temporarary closure for testing Rickshaw
 		(function () {
+			var rchartarea = document.createElement('div');
+			rchartarea.id = "rchartarea";
+			rchartarea.display = "block";
+			document.getElementById('convrick').appendChild(rchartarea);
+			document.getElementById("rchartarea").style.width = (document.getElementById('convrick').clientWidth) + "px";
+			document.getElementById("rchartarea").style.height = (document.getElementById('convrick').clientHeight) + "px";
+
 			// fake data
 			//var rdata = [ { x: -1893456000, y: 92228531 }, { x: -1577926400, y: 106021568 }, { x: -1577923200, y: 106021568 }, { x: -1262304000, y: 123202660 }, { x: -946771200, y: 132165129 }, { x: -631152000, y: 151325798 }, { x: -315619200, y: 179323175 }, { x: 0, y: 203211926 }, { x: 315532800, y: 226545805 }, { x: 631152000, y: 248709873 }, { x: 946684800, y: 281421906 }, { x: 1262304000, y: 308745538 } ];
 			
@@ -349,21 +356,52 @@ window.onload = function () {
 				};
 				return rtn;
 			})(CONV_DB.retrieveConversation(0).getJSON().reverse());
-		
-			console.log(rdata);
 			var graph = new Rickshaw.Graph( {
-					element: document.querySelector("#convrick"),
-					width: document.querySelector("#convrick").clientWidth,
-					height: document.querySelector("#convrick").clientHeight,
-					series: [ {
-							color: 'steelblue',
-							data: rdata
-					}]
-			} );
-
+				element: document.querySelector("#rchartarea"),
+				width: document.querySelector("#rchartarea").clientWidth,
+				height: document.querySelector("#rchartarea").clientHeight,
+				series: [{
+						color: 'steelblue',
+						data: rdata
+				}]
+			});
 			var axes = new Rickshaw.Graph.Axis.Time( { graph: graph } );
-
 			graph.render();
+			
+			document.getElementById("convrick").onresize = function () {
+				document.getElementById("rchartarea").style.width = (document.getElementById('convrick').clientWidth) + "px";
+				document.getElementById("rchartarea").style.height = (document.getElementById('convrick').clientHeight) + "px";
+				// draw chart
+				graph.configure({
+					width: document.querySelector("#rchartarea").clientWidth,
+					height: document.querySelector("#rchartarea").clientHeight
+				});
+				graph.render();
+			};
+
+			document.getElementById("convrick").onresize();
+			
+			var rrsbutton = document.createElement('div');
+			rrsbutton.innerHTML = "Max";
+			rrsbutton.id = "rrsbutton";
+			
+			var rrsmax = function () {
+				rrsbutton.onclick = rrsmin;
+				rrsbutton.innerHTML = "Min";
+				document.getElementById("convrick").classList.add('maxpage');
+				document.getElementById("convrick").onresize();
+			};
+			
+			var rrsmin = function () {
+				rrsbutton.onclick = rrsmax;
+				rrsbutton.innerHTML = "Max";
+				document.getElementById("convrick").classList.remove('maxpage');
+				document.getElementById("convrick").onresize();
+			}
+
+			document.getElementById("convrick").appendChild(rrsbutton);
+			rrsbutton.onclick = rrsmax;
+
 		})();
 	};
 	
