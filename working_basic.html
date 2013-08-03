@@ -1,7 +1,11 @@
 <!doctype html>
 <html>
 <head>
+<script src="lib/d3.min.js"></script>
+<script src="lib/d3.layout.min.js"></script>
+<script src="lib/rickshaw.min.js"></script>
 <script src="lib/chart.js"></script>
+<link rel="stylesheet" href="lib/rickshaw.min.css">
 <style type="text/css">
 * {
 	box-sizing: border-box;
@@ -261,13 +265,11 @@ window.onload = function () {
 		document.getElementById('convjson').innerHTML = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
 		//document.getElementById('convoutput-json').disabled=false;
 		
+		// chart.js
 		// Testing dynamic addition of chart area.
 		var chartarea = document.createElement('canvas');
 		chartarea.id = "chartarea";
 		document.getElementById('convline').appendChild(chartarea);
-		
-
-		
 		
 		// some fake data
 		var data = {
@@ -289,8 +291,6 @@ window.onload = function () {
 				}
 			]
 		};
-		
-		
 		
 		// works until console is launched for some reason
 		document.getElementById("convline").onresize = function () {
@@ -324,8 +324,45 @@ window.onload = function () {
 
 		document.getElementById("convline").appendChild(rsbutton);
 		rsbutton.onclick = rsmax;
-	
 		
+		// temporarary closure for testing Rickshaw
+		(function () {
+			// fake data
+			//var rdata = [ { x: -1893456000, y: 92228531 }, { x: -1577926400, y: 106021568 }, { x: -1577923200, y: 106021568 }, { x: -1262304000, y: 123202660 }, { x: -946771200, y: 132165129 }, { x: -631152000, y: 151325798 }, { x: -315619200, y: 179323175 }, { x: 0, y: 203211926 }, { x: 315532800, y: 226545805 }, { x: 631152000, y: 248709873 }, { x: 946684800, y: 281421906 }, { x: 1262304000, y: 308745538 } ];
+			
+			// process data from conversation
+			var rdata = (function (convLog) {
+				var i = convLog.length,
+					rtn = [],
+					tma = [],
+					tmn;
+				while (i) {
+					i -= 1;
+					tma = convLog[i].Time.split(":");
+					tmn = (+tma[0] * 3600) + (+tma[1] * 60) + (+tma[2]);
+					rtn.push({
+						"x": tmn,
+						"y": convLog[i].Contribution.split(" ").length
+					});
+				};
+				return rtn;
+			})(CONV_DB.retrieveConversation(0).getJSON().reverse());
+		
+			console.log(rdata);
+			var graph = new Rickshaw.Graph( {
+					element: document.querySelector("#convrick"),
+					width: document.querySelector("#convrick").clientWidth,
+					height: document.querySelector("#convrick").clientHeight,
+					series: [ {
+							color: 'steelblue',
+							data: rdata
+					}]
+			} );
+
+			var axes = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+
+			graph.render();
+		})();
 	};
 	
 	document.getElementById('show-json').onclick = function () {
