@@ -396,6 +396,29 @@ window.onload = function () {
 		document.getElementById('convline').classList.add('selectedPage');
 			
 	};
+	
+	document.getElementById('show-rick').onclick = function () {
+		// First find anything with the selectedTab class.
+		var selectedTab = document.getElementsByClassName('selectedTab');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
+		
+		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
+		this.classList.add('selectedTab');
+		
+		// First find anything with the selectedPage class.
+		var selectedPage = document.getElementsByClassName('selectedPage');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
+		
+		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
+		document.getElementById('convrick').classList.add('selectedPage');
+			
+	};
 
 };
 
@@ -413,6 +436,7 @@ window.onload = function () {
 <div id="show-html" class="tab">HTML</div>
 <div id="show-json" class="tab">JSON</div>
 <div id="show-line" class="tab">Line Chart</div>
+<div id="show-rick" class="tab">Time Series</div>
 </div>
 <div id="pages">
 
@@ -421,6 +445,8 @@ window.onload = function () {
 <div id="convhtml" class="page tabbed">
 </div>
 <div id="convline" class="page tabbed">
+</div>
+<div id="convrick" class="page tabbed">
 </div>
 </div>
 
