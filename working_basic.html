@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<script src="lib/chart.js"></script>
 <style type="text/css">
 * {
 	box-sizing: border-box;
@@ -53,16 +54,19 @@ html, body {
 	position: absolute;
 	left: 0;
 	top: 0;
+	display: block;
+	visibility: hidden;
 }
 .tabbed {
 	z-index: 1 !important;
-	display: none;
+	display: block;
 }
 .selectedTab {
 	text-decoration: underline;
 }
 .selectedPage {
-	display: block;
+	//display: block;
+	visibility: visible;
 }
 table {
 	font-family: 'Georgia';
@@ -90,6 +94,18 @@ td {
 #convhtml{
 	background-color: #000;
 }
+
+#rsbutton {
+	position: absolute;
+	display: block;
+	right: 10px;
+	top: 10px;
+}
+.maxpage {
+	left: -100%;
+	width: 200%;
+}
+
 </style>
 <script>
 // version: 0.0.2
@@ -232,6 +248,72 @@ window.onload = function () {
 		//temporary solution: show first conversation entered in JSON page
 		document.getElementById('convjson').innerHTML = JSON.stringify(CONV_DB.retrieveConversation(0).getJSON().reverse(), null, '\t');
 		//document.getElementById('convoutput-json').disabled=false;
+		
+		// Testing dynamic addition of chart area.
+		var chartarea = document.createElement('canvas');
+		chartarea.id = "chartarea";
+		document.getElementById('convline').appendChild(chartarea);
+		
+
+		
+		
+		// some fake data
+		var data = {
+			labels : ["January","February","March","April","May","June","July"],
+			datasets : [
+				{
+					fillColor : "rgba(220,220,220,0.5)",
+					strokeColor : "rgba(220,220,220,1)",
+					pointColor : "rgba(220,220,220,1)",
+					pointStrokeColor : "#fff",
+					data : [65,59,90,81,56,55,40]
+				},
+				{
+					fillColor : "rgba(151,187,205,0.5)",
+					strokeColor : "rgba(151,187,205,1)",
+					pointColor : "rgba(151,187,205,1)",
+					pointStrokeColor : "#fff",
+					data : [28,48,40,19,96,27,100]
+				}
+			]
+		};
+		
+		
+		
+		// works until console is launched for some reason
+		document.getElementById("convline").onresize = function () {
+			var ctx = document.getElementById("chartarea").getContext("2d");
+			document.getElementById("chartarea").width = (document.getElementById('convline').clientWidth);
+			document.getElementById("chartarea").height = (document.getElementById('convline').clientHeight);
+			// draw chart
+			var myNewChart = new Chart(ctx).Line(data);
+		};
+		
+		document.getElementById("convline").onresize();		
+
+		// add maximise button to chart area
+		var rsbutton = document.createElement('div');
+		rsbutton.innerHTML = "Max";
+		rsbutton.id = "rsbutton";
+		
+		var rsmax = function () {
+			rsbutton.onclick = rsmin;
+			rsbutton.innerHTML = "Min";
+			document.getElementById("convline").classList.add('maxpage');
+			document.getElementById("convline").onresize();
+		};
+		
+		var rsmin = function () {
+			rsbutton.onclick = rsmax;
+			rsbutton.innerHTML = "Max";
+			document.getElementById("convline").classList.remove('maxpage');
+			document.getElementById("convline").onresize();
+		}
+
+		document.getElementById("convline").appendChild(rsbutton);
+		rsbutton.onclick = rsmax;
+	
+		
 	};
 	
 	document.getElementById('show-json').onclick = function () {
@@ -255,7 +337,7 @@ window.onload = function () {
 		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
 		document.getElementById('convjson').classList.add('selectedPage');
 		
-	}
+	};
 	
 	document.getElementById('show-html').onclick = function () {
 		// First find anything with the selectedTab class.
@@ -278,7 +360,30 @@ window.onload = function () {
 		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
 		document.getElementById('convhtml').classList.add('selectedPage');
 			
-	}
+	};
+	
+	document.getElementById('show-line').onclick = function () {
+		// First find anything with the selectedTab class.
+		var selectedTab = document.getElementsByClassName('selectedTab');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
+		
+		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
+		this.classList.add('selectedTab');
+		
+		// First find anything with the selectedPage class.
+		var selectedPage = document.getElementsByClassName('selectedPage');
+		// There should only be one element with this class, so if there is a list go for the first.
+		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
+		// Assuming we have got an element, remove the class from it.
+		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
+		
+		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
+		document.getElementById('convline').classList.add('selectedPage');
+			
+	};
 
 };
 
@@ -292,17 +397,18 @@ window.onload = function () {
 </textarea>
 </div>
 <div id="results">
-<div class="tabbar">
+<div id="tabbar">
 <div id="show-html" class="tab">HTML</div>
 <div id="show-json" class="tab">JSON</div>
+<div id="show-line" class="tab">Line Chart</div>
 </div>
 <div id="pages">
-<div id="loading" class="page">
-Loading
-</div>
+
 <textarea id="convjson" readonly class="page tabbed">
 </textarea>
 <div id="convhtml" class="page tabbed">
+</div>
+<div id="convline" class="page tabbed">
 </div>
 </div>
 
