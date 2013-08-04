@@ -101,7 +101,7 @@ td {
 	background-color: #000;
 }
 
-#rsbutton, #rrsbutton {
+#rsbutton, #rrsbutton, #rrsbutton2 {
 	position: absolute;
 	display: block;
 	right: 10px;
@@ -409,6 +409,116 @@ window.onload = function () {
 			rrsbutton.onclick = rrsmax;
 
 		})();
+		
+		// second temporarary closure for testing Rickshaw
+		(function () {
+			var rchartarea = document.createElement('div');
+			rchartarea.id = "rchartarea2";
+			rchartarea.display = "block";
+			document.getElementById('convrick2').appendChild(rchartarea);
+			document.getElementById("rchartarea2").style.width = (document.getElementById('convrick2').clientWidth) + "px";
+			document.getElementById("rchartarea2").style.height = (document.getElementById('convrick2').clientHeight) + "px";
+			
+			// process data from conversation
+			var rdata = (function (convLog) {
+				var i = convLog.length,
+					tma = [],
+					tmn,
+					spk = [],
+					und = [],
+					rtn = {
+						"SPEAKER": [],
+						"UNDERSTANDER": []
+					};
+				while (i) {
+					i -= 1;
+					tma = convLog[i].Time.split(":");
+					tmn = (+tma[0] * 3600) + (+tma[1] * 60) + (+tma[2]);
+					rtn[convLog[i].Author].push({
+						"x": tmn,
+						"y": convLog[i].Contribution.split(" ").length,
+						"c": convLog[i].Contribution
+					});
+				};
+				console.log(rtn);
+				return rtn;
+			})(CONV_DB.retrieveConversation(0).getJSON());
+			var graph = new Rickshaw.Graph( {
+				element: document.querySelector("#rchartarea2"),
+				width: document.querySelector("#rchartarea2").clientWidth,
+				height: document.querySelector("#rchartarea2").clientHeight,
+				series: [
+					{
+						name: "SPEAKER",
+						color: 'steelblue',
+						data: rdata.SPEAKER
+					},
+					{
+						name: "UNDERSTANDER",
+						color: '#f00',
+						data: rdata.UNDERSTANDER
+					}
+				],
+				renderer: 'line',
+				interpolation: 'linear'
+			});
+			/*var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+				graph: graph
+			} );*/
+			
+			var hoverDetail = new Rickshaw.Graph.HoverDetail({
+				graph: graph,
+				formatter: function(series, x, y, d, l, o) {
+					var date = '<span class="date">' + new Date(d).toTimeString() + '</span>',
+						swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>',
+						message = '<div style="width: 100">' + o.value.c + '</div>',
+						content = swatch + series.name + ": " + parseInt(l) + '<br>' + date + '<br>' + message;
+					return content;
+				}
+			});
+			var xAxis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+			var yAxis = new Rickshaw.Graph.Axis.Y({
+					graph: graph,
+					tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+				});
+			graph.render();
+			
+			document.getElementById("convrick2").onresize = function () {
+				document.getElementById("rchartarea2").style.width = (document.getElementById('convrick2').clientWidth) + "px";
+				document.getElementById("rchartarea2").style.height = (document.getElementById('convrick2').clientHeight) + "px";
+				// draw chart
+				graph.configure({
+					width: document.querySelector("#rchartarea2").clientWidth,
+					height: document.querySelector("#rchartarea2").clientHeight
+				});
+				graph.render();
+			};
+
+			document.getElementById("convrick2").onresize();
+			
+			var rrsbutton = document.createElement('div');
+			rrsbutton.innerHTML = "Max";
+			rrsbutton.id = "rrsbutton2";
+			
+			var rrsmax = function () {
+				rrsbutton.onclick = rrsmin;
+				rrsbutton.innerHTML = "Min";
+				document.getElementById("convrick2").classList.add('maxpage');
+				document.getElementById("convrick2").onresize();
+			};
+			
+			var rrsmin = function () {
+				rrsbutton.onclick = rrsmax;
+				rrsbutton.innerHTML = "Max";
+				document.getElementById("convrick2").classList.remove('maxpage');
+				document.getElementById("convrick2").onresize();
+			}
+
+			document.getElementById("convrick2").appendChild(rrsbutton);
+			rrsbutton.onclick = rrsmax;
+
+		})();
+		
 	};
 	
 	// Create tabs and pages as specified and add click event listeners.
