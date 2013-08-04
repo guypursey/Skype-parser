@@ -195,7 +195,7 @@ var CONV_DB = (function () {
 						return convLog;
 					},
 					getJSON = function () {
-						return convLog; // TODO: will return an array -- but that's okay isn't it?
+						return copyObj(convLog); // TODO: will return an array -- but that's okay isn't it?
 					};
 				return {
 					changeName: changeName,
@@ -219,7 +219,7 @@ var CONV_DB = (function () {
 		},
 		retrieveConversation = function (convKey) {
 			//console.log(convLogs);
-			return copyObj(convLogs[convKey]);
+			return convLogs[convKey];
 		};
 		return {
 			createConversation: createConversation,
@@ -357,7 +357,7 @@ window.onload = function () {
 					});
 				};
 				return rtn;
-			})(CONV_DB.retrieveConversation(0).getJSON().reverse());
+			})(CONV_DB.retrieveConversation(0).getJSON());
 			var graph = new Rickshaw.Graph( {
 				element: document.querySelector("#rchartarea"),
 				width: document.querySelector("#rchartarea").clientWidth,
