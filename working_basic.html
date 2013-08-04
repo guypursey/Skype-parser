@@ -48,7 +48,7 @@ html, body {
 .tab {
 	display: inline-block;
 	padding: 5px;
-	width: 20%;
+	width: 10%;
 	overflow: hidden;
 }
 .page {
@@ -60,6 +60,8 @@ html, body {
 	top: 0;
 	display: block;
 	visibility: hidden;
+	background-color: #000;
+	color: #fff;
 }
 .tabbed {
 	z-index: 1 !important;
@@ -405,12 +407,24 @@ window.onload = function () {
 		})();
 	};
 	
-	// Add click event listeners to tab headers.
+	// Create tabs and pages as specified and add click event listeners.
 	(function (tabarr) {
-		var i = tabarr.length;
+		var tabarr = tabarr.reverse(),
+			i = tabarr.length,
+			tab,
+			page;
 		while (i) {
 			i -= 1;
-			document.getElementById('show-' + tabarr[i]).onclick = (function (t) {
+			page = document.createElement(tabarr[i].element || 'div');
+			tab = document.createElement('div');
+			page.id = "conv" + tabarr[i].suffix;
+			tab.id = "show-" + tabarr[i].suffix;
+			tab.classList.add("tab");
+			page.classList.add("page","tabbed");
+			tab.innerHTML = tabarr[i].label;
+			document.getElementById('pages').appendChild(page);
+			document.getElementById('tabbar').appendChild(tab);
+			document.getElementById('show-' + tabarr[i].suffix).onclick = (function (t) {
 				return function () {
 					// First find anything with the selectedTab class.
 					var selectedTab = document.getElementsByClassName('selectedTab');
@@ -432,13 +446,15 @@ window.onload = function () {
 					// Now nothing is 'selectedPage', add 'selectedPage' to this class.
 					document.getElementById('conv' + t).classList.add('selectedPage');
 				};	
-			})(tabarr[i]);
+			})(tabarr[i].suffix);
 		}
 	})([
-		"json",
-		"html",
-		"line",
-		"rick"
+		{ suffix: "json", label: "JSON", element: "textarea" },
+		{ suffix: "html", label: "HTML" },
+		{ suffix: "line", label: "Chart.js" },
+		{ suffix: "rick", label: "Rickshaw Test" },
+		{ suffix: "rick2", label: "Rickshaw Test 2" },
+		{ suffix: "meta", label: "MetaData" }
 	]);
 };
 
@@ -453,21 +469,8 @@ window.onload = function () {
 </div>
 <div id="results">
 <div id="tabbar">
-<div id="show-html" class="tab">HTML</div>
-<div id="show-json" class="tab">JSON</div>
-<div id="show-line" class="tab">Line Chart</div>
-<div id="show-rick" class="tab">Time Series</div>
 </div>
 <div id="pages">
-
-<textarea id="convjson" readonly class="page tabbed">
-</textarea>
-<div id="convhtml" class="page tabbed">
-</div>
-<div id="convline" class="page tabbed">
-</div>
-<div id="convrick" class="page tabbed">
-</div>
 </div>
 
 </body>
