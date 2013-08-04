@@ -405,98 +405,41 @@ window.onload = function () {
 		})();
 	};
 	
-	document.getElementById('show-json').onclick = function () {
-		// First find anything with the selectedTab class.
-		var selectedTab = document.getElementsByClassName('selectedTab');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
-		
-		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
-		this.classList.add('selectedTab');
-		
-		// First find anything with the selectedPage class.
-		var selectedPage = document.getElementsByClassName('selectedPage');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
-		
-		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
-		document.getElementById('convjson').classList.add('selectedPage');
-		
-	};
-	
-	document.getElementById('show-html').onclick = function () {
-		// First find anything with the selectedTab class.
-		var selectedTab = document.getElementsByClassName('selectedTab');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
-		
-		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
-		this.classList.add('selectedTab');
-		
-		// First find anything with the selectedPage class.
-		var selectedPage = document.getElementsByClassName('selectedPage');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
-		
-		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
-		document.getElementById('convhtml').classList.add('selectedPage');
-			
-	};
-	
-	document.getElementById('show-line').onclick = function () {
-		// First find anything with the selectedTab class.
-		var selectedTab = document.getElementsByClassName('selectedTab');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
-		
-		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
-		this.classList.add('selectedTab');
-		
-		// First find anything with the selectedPage class.
-		var selectedPage = document.getElementsByClassName('selectedPage');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
-		
-		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
-		document.getElementById('convline').classList.add('selectedPage');
-			
-	};
-	
-	document.getElementById('show-rick').onclick = function () {
-		// First find anything with the selectedTab class.
-		var selectedTab = document.getElementsByClassName('selectedTab');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedTab) { selectedTab.classList.remove('selectedTab');}
-		
-		// Now nothing is 'selectedTab', add 'selectedTab' to this class.
-		this.classList.add('selectedTab');
-		
-		// First find anything with the selectedPage class.
-		var selectedPage = document.getElementsByClassName('selectedPage');
-		// There should only be one element with this class, so if there is a list go for the first.
-		if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
-		// Assuming we have got an element, remove the class from it.
-		if (selectedPage) { selectedPage.classList.remove('selectedPage');}
-		
-		// Now nothing is 'selectedPage', add 'selectedPage' to this class.
-		document.getElementById('convrick').classList.add('selectedPage');
-			
-	};
-
+	// Add click event listeners to tab headers.
+	(function (tabarr) {
+		var i = tabarr.length;
+		while (i) {
+			i -= 1;
+			document.getElementById('show-' + tabarr[i]).onclick = (function (t) {
+				return function () {
+					// First find anything with the selectedTab class.
+					var selectedTab = document.getElementsByClassName('selectedTab');
+					// There should only be one element with this class, so if there is a list go for the first.
+					if (selectedTab.length) { selectedTab = selectedTab[0] } else { selectedTab = null };
+					// Assuming we have got an element, remove the class from it.
+					if (selectedTab) { selectedTab.classList.remove('selectedTab');}
+					
+					// Now nothing is 'selectedTab', add 'selectedTab' to this class.
+					this.classList.add('selectedTab');
+					
+					// First find anything with the selectedPage class.
+					var selectedPage = document.getElementsByClassName('selectedPage');
+					// There should only be one element with this class, so if there is a list go for the first.
+					if (selectedPage.length) { selectedPage = selectedPage[0] } else { selectedPage = null };
+					// Assuming we have got an element, remove the class from it.
+					if (selectedPage) { selectedPage.classList.remove('selectedPage');}
+					
+					// Now nothing is 'selectedPage', add 'selectedPage' to this class.
+					document.getElementById('conv' + t).classList.add('selectedPage');
+				};	
+			})(tabarr[i]);
+		}
+	})([
+		"json",
+		"html",
+		"line",
+		"rick"
+	]);
 };
 
 </script>
