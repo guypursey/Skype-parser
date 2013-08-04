@@ -337,9 +337,6 @@ window.onload = function () {
 			document.getElementById('convrick').appendChild(rchartarea);
 			document.getElementById("rchartarea").style.width = (document.getElementById('convrick').clientWidth) + "px";
 			document.getElementById("rchartarea").style.height = (document.getElementById('convrick').clientHeight) + "px";
-
-			// fake data
-			//var rdata = [ { x: -1893456000, y: 92228531 }, { x: -1577926400, y: 106021568 }, { x: -1577923200, y: 106021568 }, { x: -1262304000, y: 123202660 }, { x: -946771200, y: 132165129 }, { x: -631152000, y: 151325798 }, { x: -315619200, y: 179323175 }, { x: 0, y: 203211926 }, { x: 315532800, y: 226545805 }, { x: 631152000, y: 248709873 }, { x: 946684800, y: 281421906 }, { x: 1262304000, y: 308745538 } ];
 			
 			// process data from conversation
 			var rdata = (function (convLog) {
@@ -362,12 +359,19 @@ window.onload = function () {
 				element: document.querySelector("#rchartarea"),
 				width: document.querySelector("#rchartarea").clientWidth,
 				height: document.querySelector("#rchartarea").clientHeight,
-				series: [{
+				series: [
+					{
 						color: 'steelblue',
 						data: rdata
-				}]
+					}
+				],
+				interpolation: 'linear'
 			});
-			var axes = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+			var xAxis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+			var yAxis = new Rickshaw.Graph.Axis.Y({
+					graph: graph,
+					tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+				});
 			graph.render();
 			
 			document.getElementById("convrick").onresize = function () {
