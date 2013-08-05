@@ -6,6 +6,11 @@
 <script src="lib/rickshaw.min.js"></script>
 <script src="lib/chart.js"></script>
 <link rel="stylesheet" href="lib/rickshaw.min.css">
+
+<script type="text/javascript" src="lib/rgbcolor.js"></script> 
+<script type="text/javascript" src="lib/StackBlur.js"></script>
+<script type="text/javascript" src="lib/canvg.js"></script> 
+
 <style type="text/css">
 * {
 	box-sizing: border-box;
@@ -477,16 +482,17 @@ window.onload = function () {
 				formatter: function(series, x, y, d, l, o) {
 					var date = '<span class="date">' + new Date(d).toTimeString() + '</span>',
 						swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>',
-						message = '<div style="width: 100">' + o.value.c + '</div>',
+						message = '<div style="/* height: 200px; */ width: 200px; white-space: normal;">' + o.value.c + '</div>',
 						content = swatch + series.name + ": " + parseInt(l) + '<br>' + date + '<br>' + message;
 					return content;
 				}
 			});
 			var xAxis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
-			var yAxis = new Rickshaw.Graph.Axis.Y({
+			// Have to work out what to do with Y axis as it stops chart from rendering as image...
+			/*var yAxis = new Rickshaw.Graph.Axis.Y({
 					graph: graph,
 					tickFormat: Rickshaw.Fixtures.Number.formatKMBT
-				});
+				});*/
 			graph.render();
 			
 			document.getElementById("convrick2").onresize = function () {
@@ -522,6 +528,31 @@ window.onload = function () {
 
 			document.getElementById("convrick2").appendChild(rrsbutton);
 			rrsbutton.onclick = rrsmax;
+			
+			var rcsavebutton = document.createElement('div');
+			rcsavebutton.innerHTML = "Save";
+			rcsavebutton.id = "rcsavebutton";
+			
+			var rcsavefn = function () {
+				var convcanv = document.getElementById('convcanv');
+				if (!convcanv) {
+					convcanv = document.createElement('div');
+					convcanv.id = "convcanv";
+					document.getElementById('pages').appendChild(convcanv);
+				}
+				convcanv.appendChild(document.createElement("canvas"));
+				var canv = convcanv.children[0];
+				var canvcont = canv.getContext("2d");
+				canv.width = document.getElementById("rchartarea2").clientWidth;
+				canv.height = document.getElementById("rchartarea2").clientHeight;
+				canvcont.drawSvg(document.getElementById("rchartarea2").innerHTML.match(/\<svg.*\<\/svg\>/gi)[0], 0, 0, canv.clientWidth, canv.clientHeight);
+				var img = canv.toDataURL("image/png");
+				document.getElementById("rchartarea2").appendChild(document.createElement('img')).src = img;
+			};
+
+			document.getElementById("convrick2").appendChild(rcsavebutton);
+			rcsavebutton.onclick = rcsavefn;
+			
 
 		})();
 		
